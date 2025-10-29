@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Backend Spring Boot Application
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: football-standings-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - API_FOOTBALL_KEY=${API_FOOTBALL_KEY:-9bb66184e0c8145384fd2cc0f7b914ada57b4e8fd2e4d6d586adcc27c257a978}
+      - API_FOOTBALL_HOST=${API_FOOTBALL_HOST:-v3.football.api-sports.io}
+    networks:
+      - football-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Frontend React TypeScript Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: football-standings-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - football-network
+    environment:
+      - REACT_APP_API_BASE_URL=http://backend:8080
+    restart: unless-stopped
+
+networks:
+  football-network:
+    driver: bridge

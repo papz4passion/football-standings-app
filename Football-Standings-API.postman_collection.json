@@ -1,0 +1,839 @@
+{
+	"info": {
+		"_postman_id": "football-standings-api-2025",
+		"name": "Football Standings API",
+		"description": "Complete API testing collection for Football Standings Application with unit tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response time is less than 500ms",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							"",
+							"// Test 3: Response has correct content type",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"// Test 4: Response body has required fields",
+							"pm.test(\"Response has status field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData.status).to.eql('UP');",
+							"});",
+							"",
+							"// Test 5: Response has timestamp",
+							"pm.test(\"Response has timestamp field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('timestamp');",
+							"});",
+							"",
+							"// Test 6: Response has service name",
+							"pm.test(\"Response has service field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('service');",
+							"    pm.expect(jsonData.service).to.eql('Football Standings API');",
+							"});",
+							"",
+							"// Test 7: Response has version",
+							"pm.test(\"Response has version field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('version');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				},
+				"description": "Health check endpoint to verify the API is running"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Countries",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response time is acceptable",
+							"pm.test(\"Response time is less than 2000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							"",
+							"// Test 3: Response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Test 4: Array is not empty",
+							"pm.test(\"Countries array is not empty\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.be.above(0);",
+							"});",
+							"",
+							"// Test 5: Each country has required fields",
+							"pm.test(\"Each country has country_id, country_name, and countryLogo\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        var country = jsonData[0];",
+							"        pm.expect(country).to.have.property('country_id');",
+							"        pm.expect(country).to.have.property('country_name');",
+							"        pm.expect(country).to.have.property('country_logo');",
+							"    }",
+							"});",
+							"",
+							"// Test 6: Save first country ID for next requests",
+							"pm.test(\"Save country ID for subsequent tests\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        pm.collectionVariables.set(\"country_id\", jsonData[0].country_id);",
+							"        pm.collectionVariables.set(\"country_name\", jsonData[0].country_name);",
+							"    }",
+							"});",
+							"",
+							"// Test 7: Content-Type header is correct",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/countries",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"countries"
+					]
+				},
+				"description": "Fetch all available countries"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Leagues by Country",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response time is acceptable",
+							"pm.test(\"Response time is less than 2000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							"",
+							"// Test 3: Response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Test 4: Each league has required fields",
+							"pm.test(\"Each league has required properties\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        var league = jsonData[0];",
+							"        pm.expect(league).to.have.property('league_id');",
+							"        pm.expect(league).to.have.property('league_name');",
+							"        pm.expect(league).to.have.property('country_id');",
+							"        pm.expect(league).to.have.property('country_name');",
+							"    }",
+							"});",
+							"",
+							"// Test 5: League country ID matches request",
+							"pm.test(\"League country_id matches requested country_id\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var requestedCountryId = pm.collectionVariables.get(\"country_id\");",
+							"    if (jsonData.length > 0 && requestedCountryId) {",
+							"        pm.expect(jsonData[0].country_id).to.eql(requestedCountryId);",
+							"    }",
+							"});",
+							"",
+							"// Test 6: Save league ID for next requests",
+							"pm.test(\"Save league ID for subsequent tests\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        pm.collectionVariables.set(\"league_id\", jsonData[0].league_id);",
+							"        pm.collectionVariables.set(\"league_name\", jsonData[0].league_name);",
+							"    }",
+							"});",
+							"",
+							"// Test 7: Content-Type is correct",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/leagues?country_id={{country_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"leagues"
+					],
+					"query": [
+						{
+							"key": "country_id",
+							"value": "{{country_id}}"
+						}
+					]
+				},
+				"description": "Fetch leagues for a specific country"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Leagues - Missing Parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 400 Bad Request",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"// Test 2: Response has error structure",
+							"pm.test(\"Response has error properties\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('timestamp');",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"});",
+							"",
+							"// Test 3: Error status is 400",
+							"pm.test(\"Error status is 400\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(400);",
+							"});",
+							"",
+							"// Test 4: Content-Type is correct",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/leagues",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"leagues"
+					]
+				},
+				"description": "Test error handling when country_id parameter is missing"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Teams by League",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response time is acceptable",
+							"pm.test(\"Response time is less than 3000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+							"});",
+							"",
+							"// Test 3: Response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Test 4: Each team has required fields",
+							"pm.test(\"Each team has required properties\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        var team = jsonData[0];",
+							"        pm.expect(team).to.have.property('team_key');",
+							"        pm.expect(team).to.have.property('team_name');",
+							"        pm.expect(team).to.have.property('team_country');",
+							"    }",
+							"});",
+							"",
+							"// Test 5: Save team name for standings test",
+							"pm.test(\"Save team name for subsequent tests\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        pm.collectionVariables.set(\"team_name\", jsonData[0].team_name);",
+							"    }",
+							"});",
+							"",
+							"// Test 6: Content-Type is correct",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/teams?league_id={{league_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"teams"
+					],
+					"query": [
+						{
+							"key": "league_id",
+							"value": "{{league_id}}"
+						}
+					]
+				},
+				"description": "Fetch teams in a specific league"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Teams - Missing Parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 400",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"// Test 2: Response has error structure",
+							"pm.test(\"Response has error properties\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"});",
+							"",
+							"// Test 3: Error status is 400",
+							"pm.test(\"Error status is 400\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/teams",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"teams"
+					]
+				},
+				"description": "Test error handling when league_id parameter is missing"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Standings by League",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response time is acceptable",
+							"pm.test(\"Response time is less than 3000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+							"});",
+							"",
+							"// Test 3: Response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Test 4: Each standing has required fields",
+							"pm.test(\"Each standing has required properties\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        var standing = jsonData[0];",
+							"        pm.expect(standing).to.have.property('league_id');",
+							"        pm.expect(standing).to.have.property('league_name');",
+							"        pm.expect(standing).to.have.property('team_id');",
+							"        pm.expect(standing).to.have.property('team_name');",
+							"        pm.expect(standing).to.have.property('overall_league_position');",
+							"    }",
+							"});",
+							"",
+							"// Test 5: Standings have position data",
+							"pm.test(\"Standings have position information\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.length > 0) {",
+							"        var standing = jsonData[0];",
+							"        pm.expect(standing).to.have.property('overall_league_PTS');",
+							"        pm.expect(standing).to.have.property('overall_league_W');",
+							"        pm.expect(standing).to.have.property('overall_league_D');",
+							"        pm.expect(standing).to.have.property('overall_league_L');",
+							"    }",
+							"});",
+							"",
+							"// Test 6: Content-Type is correct",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/standings?league_id={{league_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"standings"
+					],
+					"query": [
+						{
+							"key": "league_id",
+							"value": "{{league_id}}"
+						}
+					]
+				},
+				"description": "Fetch standings for a specific league"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Standings with Team Filter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Test 3: Filtered results contain team name",
+							"pm.test(\"Filtered standings contain the searched team\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var team_name = pm.collectionVariables.get(\"team_name\");",
+							"    if (jsonData.length > 0 && team_name) {",
+							"        var hasTeam = jsonData.some(function(standing) {",
+							"            return standing.team_name && standing.team_name.toLowerCase().includes(team_name.toLowerCase());",
+							"        });",
+							"        pm.expect(hasTeam).to.be.true;",
+							"    }",
+							"});",
+							"",
+							"// Test 4: Content-Type is correct",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/standings?league_id={{league_id}}&team_name={{team_name}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"standings"
+					],
+					"query": [
+						{
+							"key": "league_id",
+							"value": "{{league_id}}"
+						},
+						{
+							"key": "team_name",
+							"value": "{{team_name}}"
+						}
+					]
+				},
+				"description": "Fetch standings filtered by team name"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Standings - Missing Parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 400",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"// Test 2: Response has error structure",
+							"pm.test(\"Response has error properties\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData.status).to.eql(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/standings",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"standings"
+					]
+				},
+				"description": "Test error handling when league_id parameter is missing"
+			},
+			"response": []
+		},
+		{
+			"name": "Enable Offline Mode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response confirms offline mode enabled",
+							"pm.test(\"Response confirms offline mode enabled\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"enabled\");",
+							"});",
+							"",
+							"// Test 3: Response time is fast",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/offline-mode?enabled=true",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"offline-mode"
+					],
+					"query": [
+						{
+							"key": "enabled",
+							"value": "true"
+						}
+					]
+				},
+				"description": "Enable offline mode for cached data"
+			},
+			"response": []
+		},
+		{
+			"name": "Disable Offline Mode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response confirms offline mode disabled",
+							"pm.test(\"Response confirms offline mode disabled\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"disabled\");",
+							"});",
+							"",
+							"// Test 3: Response time is fast",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/offline-mode?enabled=false",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"offline-mode"
+					],
+					"query": [
+						{
+							"key": "enabled",
+							"value": "false"
+						}
+					]
+				},
+				"description": "Disable offline mode to fetch fresh data"
+			},
+			"response": []
+		},
+		{
+			"name": "Clear Cache",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response confirms cache cleared",
+							"pm.test(\"Response confirms cache cleared\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"cleared\");",
+							"});",
+							"",
+							"// Test 3: Response time is fast",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/cache",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"cache"
+					]
+				},
+				"description": "Clear all cached data"
+			},
+			"response": []
+		},
+		{
+			"name": "Actuator Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Response has status field",
+							"pm.test(\"Response has status field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"});",
+							"",
+							"// Test 3: Status is UP",
+							"pm.test(\"Application status is UP\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('UP');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/actuator/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"actuator",
+						"health"
+					]
+				},
+				"description": "Spring Boot Actuator health endpoint"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "country_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "country_name",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "league_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "league_name",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "team_name",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+    
+    tools {
+        jdk 'JDK-21'
+    }
+    
+    environment {
+        FOOTBALL_API_KEY = credentials('football-api-key')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out code...'
+                checkout scm
+            }
+        }
+        
+        stage('Build Backend') {
+            steps {
+                dir('backend') {
+                    echo 'Building Spring Boot application...'
+                    sh './gradlew clean build'
+                }
+            }
+        }
+        
+        stage('Test Backend') {
+            steps {
+                dir('backend') {
+                    echo 'Running backend tests...'
+                    sh './gradlew test'
+                }
+            }
+            post {
+                always {
+                    junit 'backend/build/test-results/test/*.xml'
+                }
+            }
+        }
+        
+        stage('Code Quality Check') {
+            steps {
+                dir('backend') {
+                    echo 'Running code quality checks...'
+                    sh './gradlew check'
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                dir('backend') {
+                    echo 'Building Docker image...'
+                    sh 'docker build -t football-standings-backend:${BUILD_NUMBER} .'
+                    sh 'docker tag football-standings-backend:${BUILD_NUMBER} football-standings-backend:latest'
+                }
+            }
+        }
+        
+        stage('Archive Artifacts') {
+            steps {
+                dir('backend') {
+                    archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Build completed successfully!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
