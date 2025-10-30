@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'jacoco'
 }
 
 group = 'com.sapient'
@@ -55,4 +56,76 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport // Generate report after tests run
+	ignoreFailures = true // Generate coverage even if tests fail
 }
+
+// JaCoCo Configuration
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+	dependsOn test // Tests are required to run before generating the report
+	
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+		
+		xml.outputLocation = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+		html.outputLocation = file("${buildDir}/reports/jacoco/test/html")
+	}
+	
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/config/**',
+				'**/dto/**',
+				'**/exception/ErrorResponse.class',
+				'**/FootballStandingsApplication.class'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	dependsOn jacocoTestReport
+	
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.70 // 70% minimum coverage
+			}
+		}
+		
+		rule {
+			element = 'CLASS'
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.60 // 60% minimum per class
+			}
+			
+			excludes = [
+				'com.sapient.football.config.*',
+				'com.sapient.football.dto.*',
+				'com.sapient.football.exception.ErrorResponse',
+				'com.sapient.football.FootballStandingsApplication'
+			]
+		}
+		
+		rule {
+			element = 'METHOD'
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.50 // 50% minimum per method
+			}
+		}
+	}
+}
+
+// Optional: Make build task depend on coverage verification
+// Uncomment to enforce coverage thresholds in build
+// build.dependsOn jacocoTestCoverageVerification

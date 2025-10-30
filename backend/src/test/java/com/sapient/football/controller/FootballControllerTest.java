@@ -1,5 +1,6 @@
 package com.sapient.football.controller;
 
+import com.sapient.football.config.MetricsConfig;
 import com.sapient.football.dto.CountryDTO;
 import com.sapient.football.service.FootballService;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ class FootballControllerTest {
     
     @MockBean
     private FootballService footballService;
+    
+    @MockBean
+    private MetricsConfig.FootballMetrics footballMetrics;
     
     @Test
     void testGetCountries_Success() throws Exception {
